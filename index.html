@@ -2,8 +2,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f2faf3;--c:#ffffff;--t:#173321;--m:#536b5a;--p:#76c893;--ok:#2f855a;--bad:#c53030;--w:#b7791f;--b:#cfe4d3}
-
-
 html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
 body{margin:0;font-family:Cairo,Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--t);font-size:15px}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--c);color:var(--t);border-bottom:1px solid var(--b);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
@@ -38,10 +36,64 @@ const ok=p=>{const r=me.r;return r==='Driver'||r==='User1'?p==='veh':p==='dash'|
 const def=()=>({users:[{u:'admin',n:'المدير',r:'Admin',p:H('1234')},{u:'quality',n:'مسؤول الجودة',r:'Quality',p:H('1234')},{u:'user',n:'مستخدم',r:'User',p:H('1234')}],
 set:{units:[{n:'ثلاجة 1',t:'ثلاجة',min:-25,max:-18},{n:'ثلاجة 2',t:'ثلاجة',min:-25,max:-18},{n:'سيارة 1',t:'سيارة',min:-22,max:-15},{n:'سيارة 2',t:'سيارة',min:-22,max:-15}],
 reasons:['انتهاء الصلاحية قريباً','كسر سلسلة التبريد','تلف العبوة','عيب في الجودة','خطأ في الطلب','رفض العميل'],branches:['الفرع الرئيسي','فرع 1','فرع 2'],
-ncrTypes:['انحراف حرارة','تلف عبوة','منتج منتهي','تلوث','خطأ توثيق','أخرى'],actions:['إعدام','إعادة تخزين','إعادة للمورد','تحويل لفرع آخر','فحص ومعالجة'],syncUrl:'https://frozenguard-backend-kohc.onrender.com'},
+ncrTypes:['انحراف حرارة','تلف عبوة','منتج منتهي','تلوث','خطأ توثيق','أخرى'],actions:['إعدام','إعادة تخزين','إعادة للمورد','تحويل لفرع آخر','فحص ومعالجة'],syncUrl:'https://api.jsonbin.io/v3/b/YOUR_BIN_ID'},
 temps:[],ncr:[],returns:[],complaints:[],flow:[],batches:[],ops:[],veh:[],capa:[],recall:[],prods:[],rcv:[],mvs:[],lt:[],audit:[]});
-try{db=JSON.parse(localStorage.getItem(K))}catch(e){}if(!db)db=def();db.set.syncUrl='https://frozenguard-backend-kohc.onrender.com';function mig(){const d=def();for(const k in d)if(!db[k])db[k]=d[k];db.set.vlim=db.set.vlim||{min:-18,max:-12};db.set.wh=db.set.wh||['المخزن الرئيسي','مخزن 2'];db.set.remind=db.set.remind||0;db.set.rem=db.set.rem||{f:{on:0,every:120,tone:''},v:{on:0,every:120,tone:''}};['f','v'].forEach(k=>{if(!db.set.rem[k].every)db.set.rem[k].every=120;delete db.set.rem[k].times});db.set.dwh=db.set.dwh||[...db.set.wh];if(db.set.cold==null)db.set.cold=1;if(!db.set.rng){db.set.rng=1;db.set.units.forEach(u=>{u.min=-18;u.max=-12});db.set.vlim={min:-18,max:-12};db.prods.forEach(p=>{p.min='-18';p.max='-12'})}db.set.suppliers=db.set.suppliers||['مورد 1','مورد 2','مورد 3'];db.set.defects=db.set.defects||['كرتونة ممزقة','كرتونة مبللة','كرتونة مفتوحة','كرتونة مهروسة / مشوهة','بيانات الكرتونة غير واضحة','أخرى'];if(!db.set.rs){db.set.rs=1;[['qmanager','مدير الجودة','QMgr'],['driver','المندوب','Driver'],['user1','user1','User1']].forEach(([u,n,r])=>{if(!db.users.some(x=>x.u===u))db.users.push({u,n,r,p:H('1234')})})}db.batches.filter(b=>!b.rid).forEach(b=>{const id='r'+b.id;b.rid=id;b.date=b.date||(b.cr||'').slice(0,10);db.rcv.push({id,cr:b.cr||new Date().toISOString(),by:b.by||'',s:b.s||0,no:'IN-'+(b.date||'').replace(/-/g,'')+'-'+String(db.rcv.length+1).padStart(3,'0'),date:b.date,wh:b.wh||'',rt:b.rt||'',status:b.status,sup:b.sup||'',note:''})});db.ops.filter(o=>!o.mid).forEach(o=>{const id='m'+o.id,b=db.batches.find(x=>x.no===o.batch);o.mid=id;o.prod=o.prod||(b?b.prod:'');db.mvs.push({id,cr:o.cr||new Date().toISOString(),by:o.by||'',s:o.s||0,no:'MV-'+(o.date||'').replace(/-/g,'')+'-'+String(db.mvs.length+1).padStart(3,'0'),date:o.date||(o.cr||'').slice(0,10),type:o.type,to:o.to||'',note:o.note||''})})}mig();
-const save=()=>{try{localStorage.setItem(K,JSON.stringify(db))}catch(e){toast('تعذر الحفظ المحلي',1)}};
+try{db=JSON.parse(localStorage.getItem(K))}catch(e){}if(!db)db=def();function mig(){const d=def();for(const k in d)if(!db[k])db[k]=d[k];db.set.vlim=db.set.vlim||{min:-18,max:-12};db.set.wh=db.set.wh||['المخزن الرئيسي','مخزن 2'];db.set.remind=db.set.remind||0;db.set.rem=db.set.rem||{f:{on:0,every:120,tone:''},v:{on:0,every:120,tone:''}};['f','v'].forEach(k=>{if(!db.set.rem[k].every)db.set.rem[k].every=120;delete db.set.rem[k].times});db.set.dwh=db.set.dwh||[...db.set.wh];if(db.set.cold==null)db.set.cold=1;if(!db.set.rng){db.set.rng=1;db.set.units.forEach(u=>{u.min=-18;u.max=-12});db.set.vlim={min:-18,max:-12};db.prods.forEach(p=>{p.min='-18';p.max='-12'})}db.set.suppliers=db.set.suppliers||['مورد 1','مورد 2','مورد 3'];db.set.defects=db.set.defects||['كرتونة ممزقة','كرتونة مبللة','كرتونة مفتوحة','كرتونة مهروسة / مشوهة','بيانات الكرتونة غير واضحة','أخرى'];if(!db.set.rs){db.set.rs=1;[['qmanager','مدير الجودة','QMgr'],['driver','المندوب','Driver'],['user1','user1','User1']].forEach(([u,n,r])=>{if(!db.users.some(x=>x.u===u))db.users.push({u,n,r,p:H('1234')})})}db.batches.filter(b=>!b.rid).forEach(b=>{const id='r'+b.id;b.rid=id;b.date=b.date||(b.cr||'').slice(0,10);db.rcv.push({id,cr:b.cr||new Date().toISOString(),by:b.by||'',s:b.s||0,no:'IN-'+(b.date||'').replace(/-/g,'')+'-'+String(db.rcv.length+1).padStart(3,'0'),date:b.date,wh:b.wh||'',rt:b.rt||'',status:b.status,sup:b.sup||'',note:''})});db.ops.filter(o=>!o.mid).forEach(o=>{const id='m'+o.id,b=db.batches.find(x=>x.no===o.batch);o.mid=id;o.prod=o.prod||(b?b.prod:'');db.mvs.push({id,cr:o.cr||new Date().toISOString(),by:o.by||'',s:o.s||0,no:'MV-'+(o.date||'').replace(/-/g,'')+'-'+String(db.mvs.length+1).padStart(3,'0'),date:o.date||(o.cr||'').slice(0,10),type:o.type,to:o.to||'',note:o.note||''})})}mig();
+
+// ---- Cloud Sync Integration (JSONBin.io or custom REST API)
+const save = async () => {
+    try {
+        localStorage.setItem(K, JSON.stringify(db));
+    } catch(e) {
+        toast('تعذر الحفظ المحلي', 1);
+    }
+    await syncToCloud();
+};
+
+const syncToCloud = async () => {
+    if (!navigator.onLine || !db.set.syncUrl) return;
+    try {
+        const response = await fetch(db.set.syncUrl, {
+            method: 'PUT', // or POST based on API provider
+            headers: {
+                'Content-Type': 'application/json',
+                // 'X-Master-Key': 'YOUR_API_KEY_IF_NEEDED' 
+            },
+            body: JSON.stringify(db)
+        });
+        if (response.ok) {
+            toast('تمت المزامنة السحابية بنجاح ☁️');
+        }
+    } catch (e) {
+        console.error('Cloud sync failed', e);
+    }
+};
+
+const fetchFromCloud = async () => {
+    if (!navigator.onLine || !db.set.syncUrl) return;
+    try {
+        const res = await fetch(db.set.syncUrl, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            // JSONBin returns data inside a 'record' object usually
+            db = data.record || data;
+            mig();
+            localStorage.setItem(K, JSON.stringify(db));
+            R();
+            toast('تم جلب أحدث البيانات من السحابة 🔄');
+        }
+    } catch(e) {
+        console.error('Fetch cloud data failed', e);
+    }
+};
+
+// Auto fetch cloud data on startup
+window.addEventListener('load', () => {
+    fetchFromCloud();
+});
+
 const M={
 temps:{t:'درجات الحرارة',i:'🌡️',f:[['unit','الوحدة','sel:units'],['temp','الدرجة °م','num'],['ts','وقت القياس','dt'],['note','ملاحظات','area',1]]},
 ncr:{t:'عدم المطابقة',i:'⚠️',f:[['date','التاريخ','date'],['type','نوع المشكلة','sel:ncrTypes'],['sev','الخطورة','sel:جسيمة|بسيطة'],['product','الصنف','text'],['batch','رقم التشغيلة','text',1],['desc','وصف المشكلة','area'],['action','الإجراء التصحيحي','area',1],['status','الحالة','sel:مفتوحة|قيد المعالجة|مغلقة']]},
@@ -69,8 +121,8 @@ const stO=k=>TV(k)?['ضمن الحد','خارج الحد']:((M[k].f.find(f=>f[0]
 const rows=(k,q,st,from,to)=>db[k].filter(r=>(me.r!=='Driver'||r.by===me.n)&&(!q||JSON.stringify(Object.values(r)).includes(q)||(k==='rcv'&&rits(r).some(b=>JSON.stringify(Object.values(b)).includes(q)))||(k==='mvs'&&mits(r).some(b=>JSON.stringify(Object.values(b)).includes(q))))&&(!st||sOf(k,r)===st)&&(!from||dOf(r)>=from)&&(!to||dOf(r)<=to)).sort((a,b)=>b.cr.localeCompare(a.cr));
 const pend=()=>KS.reduce((a,k)=>a+db[k].filter(r=>!r.s).length,0);
 let tt;function toast(m,bad){const t=$('#ts');t.textContent=m;t.className=bad?'bad':'';t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',3500)}
-function ps(){const e=$('#ps');if(e)e.textContent=(navigator.onLine?'🟢 متصل':'🔴 غير متصل')+(pend()?' • ⏳ '+pend()+' بانتظار المزامنة':'')}
-async function sync(){ps();if(!navigator.onLine||!db.set.syncUrl||!pend())return;try{const b={};KS.forEach(k=>b[k]=db[k].filter(r=>!r.s));const r=await fetch(db.set.syncUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});if(r.ok){KS.forEach(k=>db[k].forEach(x=>x.s=1));save();R();toast('تمت المزامنة')}}catch(e){}}
+function ps(){const e=$('#ps');if(e)e.textContent=(navigator.onLine?'🟢 متصل سحابياً':'🔴 غير متصل')+(pend()?' • ⏳ '+pend()+' قيد المزامنة':'')}
+async function sync(){ps(); await syncToCloud();}
 addEventListener('online',sync);addEventListener('offline',ps);
 async function exp(name,mime,txt){const b=new Blob(['\ufeff'+txt],{type:mime});try{const f=new File([b],name,{type:mime});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return}}catch(e){if(e.name==='AbortError')return}
 try{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();toast('تم طلب التصدير — إن لم يبدأ التنزيل استخدم زر النسخ')}catch(e){toast('تعذر التصدير، استخدم زر النسخ',1)}}
@@ -92,7 +144,7 @@ $('#mn').innerHTML=`<h2>لوحة التحكم</h2><div class="g2">${[['📦','إ
 <h2>🚨 التنبيهات</h2>${al.length?al.sort((a,b)=>b.cr.localeCompare(a.cr)).map(r=>{const u=(r.car!=null?db.set.vlim:U(r.unit))||{};return`<div class="card bad"><b>${esc(r.unit||'سيارة '+r.car)}: ${esc(r.temp)}° م</b><div class="s">الحد المسموح ${u.min} إلى ${u.max} • ${fmt(r.ts)}</div>${can('edit')?`<button class="b" onclick="ack('${r.id}')">تم اتخاذ إجراء</button>`:''}</div>`}).join(''):'<div class="card m">لا توجد تنبيهات مفتوحة ✅</div>'}
 <h2>🌡️ آخر قراءة لكل وحدة</h2><div class="g2">${db.set.units.map(u=>{const l=db.temps.filter(r=>r.unit===u.n).sort((a,b)=>b.ts.localeCompare(a.ts))[0];return`<div class="st ${l?(out(l)?'bad':'ok'):''}"><small>${esc(u.n)}</small><b>${l?esc(l.temp)+'°':'—'}</b><small>${u.min}/${u.max}</small></div>`}).join('')}</div>
 <h2>↩️ المرتجعات حسب السبب</h2><div class="card">${Object.keys(rs).length?Object.entries(rs).map(([k,v])=>`<div class="s">${esc(k)} (${v})</div><div class="bar" style="width:${100*v/mx}%"></div>`).join(''):'<span class="m">لا بيانات</span>'}</div>`}
-function ack(id){const r=[...db.temps,...db.veh].find(x=>x.id===id);aud('استلام تنبيه','temps',r);r.ack=1;r.ackBy=me.n;r.s=0;save();R();sync()}
+function ack(id){const r=[...db.temps,...db.veh].find(x=>x.id===id);aud('استلام تنبيه','temps',r);r.ack=1;r.ackBy=me.n;r.s=0;save();}
 // ---- modules
 function card(k,r){const m=M[k],st=sOf(k,r),cls=['خارج الحد','مفتوحة','جديدة','مرفوض','نشط','مفتوح'].includes(st)?'bad':['مغلقة','ضمن الحد','مقبول','مغلق'].includes(st)?'ok':'';
 return`<div class="card ${TV(k)&&out(r)&&!r.ack?'bad':''}"><div class="row"><b>${esc(k==='ncr'&&r.no||k==='capa'&&r.no||r[m.f[0][0]])}${TV(k)?' — '+esc(r.temp)+'°م':''}</b>${st?`<span class="bd ${cls}">${st}</span>`:''}</div>`+
@@ -109,7 +161,7 @@ function sv(k,id){if(!(id?can('edit'):can('add'))||(me.r==='Driver'&&k!=='veh'))
 let r=id?db[k].find(x=>x.id===id):null;const er=chk(k,o,id);if(er)return toast(er,1);if(r)Object.assign(r,o,{s:0,ack:0});else{r={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),cr:new Date().toISOString(),by:me.n,s:0,...o};if(TV(k))r.ack=0;if(k==='ncr')r.no='NC-'+Math.floor(1e5+Math.random()*9e5);if(k==='capa')r.no='CP-'+Math.floor(1e4+Math.random()*9e4);db[k].push(r)}aud(id?'تعديل':'إضافة',k,r);
 if(TV(k)&&out(r)&&!id){alarm(r);autoNcr(r,(k==='veh'?'حرارة سيارة توزيع خارج النطاق ('+r.car+' — '+r.drv+')':'قراءة حرارة خارج النطاق في '+r.unit)+': '+r.temp+'°م')}
 if(k==='batches'&&!id){const p=db.prods.find(x=>x.n===r.prod);if(p&&p.min!==''&&(+r.rt<+p.min||+r.rt>+p.max)){r.status='محجوز';toast('حرارة الاستلام خارج حد المنتج — تم حجز الدفعة',1);autoNcr(r,'حرارة استلام الدفعة '+r.no+' خارج حد '+r.prod+': '+r.rt+'°م')}}
-save();cl();R();sync()}
+save();cl();R();}
 function alarm(r){const u=r.car!=null?db.set.vlim:U(r.unit),m=`⚠️ ${r.unit||'سيارة '+r.car}: ${r.temp}° خارج الحد (${u.min} إلى ${u.max})`;toast(m,1);try{navigator.vibrate([300,100,300]);if(Notification.permission==='granted')new Notification('FrozenGuard',{body:m})}catch(e){}}
 function del(k,id){if(!can('del'))return toast('غير مسموح',1);if(!confirm('حذف هذا السجل؟'))return;aud('حذف',k,db[k].find(r=>r.id===id));db[k]=db[k].filter(r=>r.id!==id);save();R()}
 // ---- reports
@@ -124,27 +176,22 @@ const xl=()=>exp(`FrozenGuard-${rp.k}-${td()}.xls`,'application/vnd.ms-excel','<
 function pdf(){$('#pr').innerHTML=`<h2 dir="rtl">FrozenGuard — ${M[rp.k].t}</h2><p dir="rtl">${td()} • ${me.n}</p>`+tbl(rp.k,cur());try{print()}catch(e){toast('تعذرت الطباعة',1)}}
 // ---- settings
 const LB={reasons:'أسباب المرتجعات',branches:'الفروع',ncrTypes:'أنواع عدم المطابقة',actions:'الإجراءات المتخذة للمرتجعات',wh:'المخازن',suppliers:'جهات التوريد',defects:'أنواع عيوب الكراتين',dwh:'مخازن الصرف'};
-function set(){const s=db.set;$('#mn').innerHTML=`<h2>⚙️ الإدارة</h2>${ADM()}<div class="card"><b>حدود درجات الحرارة</b>${s.units.map((u,i)=>`<div class="row"><input value="${esc(u.n)}" onchange="s_(${i},'n',this.value)"><select onchange="s_(${i},'t',this.value)"><option ${u.t=='ثلاجة'?'selected':''}>ثلاجة</option><option ${u.t=='سيارة'?'selected':''}>سيارة</option></select><input type="number" value="${u.min}" onchange="s_(${i},'min',this.value)"><input type="number" value="${u.max}" onchange="s_(${i},'max',this.value)"><button class="lk bad" onclick="db.set.units.splice(${i},1);save();set()">✕</button></div>`).join('')}<small>الاسم • النوع • الأدنى • الأقصى</small><button class="b" style="width:100%" onclick="db.set.units.push({n:'وحدة جديدة',t:'ثلاجة',min:-25,max:-18});save();set()">+ وحدة</button></div>
-${Object.keys(LB).map(k=>`<div class="card"><b>${LB[k]}</b>${s[k].map((x,i)=>`<div class="row"><input value="${esc(x)}" onchange="db.set.${k}[${i}]=this.value.trim();save()"><button class="lk bad" onclick="db.set.${k}.splice(${i},1);save();set()">✕</button></div>`).join('')}<button class="b" style="width:100%" onclick="db.set.${k}.push('جديد');save();set()">+ إضافة</button></div>`).join('')}
-<div class="card"><b>عنوان المزامنة (Cloud Backend URL)</b><input value="${esc(s.syncUrl)}" onchange="db.set.syncUrl=this.value.trim();save()" placeholder="https://..."><button class="b" onclick="sync()">مزامنة الآن</button></div>
-<div class="card"><b>إدارة البيانات والنسخ الاحتياطي</b><button class="b" onclick="exp('FrozenGuard-Backup-${td()}.json','application/json',JSON.stringify(db))">تصدير كامل قاعدة البيانات (JSON)</button><label class="b g" style="text-align:center;cursor:pointer">استيراد نسخة احتياطية<input type="file" id="bkf" style="display:none" onchange="bkFile(this)"></label><div id="bkr"></div><textarea id="bk" style="display:none"></textarea></div>`}
-function s_(i,k,v){db.set.units[i][k]=k=='min'||k=='max'?+v:v;save()}
-function ADM(){return me.r==='Admin'?`<div class="card"><b>المستخدمون والصلاحيات</b>${db.users.map((u,i)=>`<div class="row"><span><b>${esc(u.n)}</b> (${esc(u.u)})</span><span class="pill">${RL[u.r]||u.r}</span>${u.u!=='admin'?`<button class="lk bad" onclick="db.users.splice(${i},1);save();set()">حذف</button>`:''}</div>`).join('')}<button class="b" onclick="newUsr()">+ مستخدم جديد</button></div>`:''}
-function newUsr(){const u=prompt('اسم المستخدم (ID):'),n=prompt('الاسم الكامل:'),r=prompt('الصلاحية: Admin / Quality / QMgr / Driver / User1','Quality'),p=prompt('كلمة المرور:','1234');if(!u||!n||!r||!p)return;if(db.users.some(x=>x.u===u))return toast('المستخدم موجود مسبقاً',1);db.users.push({u:u.trim(),n:n.trim(),r:r.trim(),p:H(p)});save();set();toast('تمت الإضافة')}
-// ---- extra modules
-function more(){$('#mn').innerHTML=`<h2>⋯ المزيد</h2><div class="card mi" onclick="pg='rep';R()"><div class="ic">📊</div><div><b>التقارير المتقدمة</b><div class="s">عرض وتصدير وتقسيم السجلات</div></div></div><div class="card mi" onclick="pg='set';R()"><div class="ic">⚙️</div><div><b>الإعدادات والإدارة</b><div class="s">الوحدات، الفروع، والمستخدمين</div></div></div><div class="card mi" onclick="pg='audit';R()"><div class="ic">📜</div><div><b>سجل النشاطات (Audit Trail)</b><div class="s">متابعة العمليات والتعديلات</div></div></div>`}
-function audit(){$('#mn').innerHTML=`<h2>📜 سجل النشاطات</h2><div class="card">${(db.audit||[]).slice(-50).reverse().map(a=>`<div><b>${esc(a.u)}</b> — ${esc(a.act)} (${esc(a.mod)}) <small>${fmt(a.cr)}</small>${a.dat?'<div class="s">'+esc(JSON.stringify(a.dat))+'</div>':''}</div><hr style="border:0;border-top:1px solid var(--b);margin:6px 0">`).join('')}</div>`}
-function aud(act,mod,dat){db.audit=db.audit||[];db.audit.push({cr:new Date().toISOString(),u:me.u,act,mod,dat});save()}
-function autoNcr(r,desc){db.ncr.push({id:Date.now().toString(36),cr:new Date().toISOString(),by:me.n,s:0,no:'NC-'+Math.floor(1e5+Math.random()*9e5),date:td(),type:'انحراف حرارة',sev:'جسيمة',product:r.prod||r.unit||'—',batch:r.batch||'—',desc,action:'قيد المتابعة والفحص',status:'مفتوحة'})}
-function det(id){const b=db.batches.find(x=>x.id===id);if(!b)return;$('#md').innerHTML=`<div class="sh" style="text-align:center"><h3>تتبع الدفعة: ${esc(b.no)}</h3><div class="qr" id="qrc"></div><p>المنتج: ${esc(b.prod)} • الكمية: ${b.qty}</p><button class="b" onclick="cl()">إغلاق</button></div>`;$('#md').className='on';try{const q=qrcode(0,'M');q.addData(b.no+'|'+b.prod+'|'+b.qty);q.make();$('#qrc').innerHTML=q.createSvgTag()}catch(e){}}
-function ltg(r){const b=db.batches.find(x=>x.no===(r.batch||r.no));return{qty:b?b.qty:0,kg:b?b.kg:0,refs:b?b.no:'—'}}
-const ltm=r=>{if(!r.t1||!r.t2)return'—';const [h1,m1]=r.t1.split(':').map(Number),[h2,m2]=r.t2.split(':').map(Number);return Math.max(0,(h2*60+m2)-(h1*60+m1))}
-const ltr=r=>{const d=+ltm(r),k=+ltg(r).kg;return d>0&&k>0?(k/(d/60)).toFixed(2):'0'}
-function kit(r){return db.batches.filter(b=>b.rid===r.id||b.mid===r.id)}
-const mcn=r=>db.mvs.find(x=>x.id===r.mid)?.no||''
-const bal=b=>{const al=db.ops.filter(o=>o.batch===b.no);return(+b.qty||0)+al.reduce((a,o)=>a+(o.type==='صرف'?-+o.qty:o.type==='مرتجع'||o.type==='تسوية'?+o.qty:0),0)}
-function chk(k,o,id){if(k==='batches'){if(!id&&db.batches.some(b=>b.no===o.no))return'رقم الدفعة موجود مسبقاً';if(o.pd&&o.ex&&o.pd>o.ex)return'تاريخ الإنتاج لا يمكن أن يكون بعد تاريخ الصلاحية'}if(k==='ops'){const b=db.batches.find(x=>x.no===o.batch);if(!b)return'الدفعة غير موجودة';if(o.type==='صرف'&&bal(b)<+o.qty)return'الكمية المطلوبة أكبر من الرصيد الحالي للدفعة ('+bal(b)+')'}return null}
-function clo(k,id){const r=db[k].find(x=>x.id===id);if(!r)return;const ac=prompt('أدخل الإجراء التصحيحي للإغلاق:','تم المعالجة بنجاح');if(!ac)return;r.status='مغلقة';r.action=ac;r.s=0;aud('إغلاق عدم مطابقة','ncr',r);save();R();sync()}
-function P(){return{dash,bat:()=>mod('batches'),opr:()=>mod('ops'),tmp:()=>mod('temps'),lt:()=>mod('lt'),qual:()=>mod('ncr'),more,audit,set,rep}}
-R();
+function set(){const s=db.set;$('#mn').innerHTML=`<h2>⚙️ الإدارة والمزامنة</h2>${ADM()}<div class="card"><b>حدود درجات الحرارة</b>${s.units.map((u,i)=>`<div class="row"><input value="${esc(u.n)}" onchange="s_(${i},'n',this.value)"><select onchange="s_(${i},'t',this.value)"><option ${u.t=='ثلاجة'?'selected':''}>ثلاجة</option><option ${u.t=='سيارة'?'selected':''}>سيارة</option></select><input type="number" value="${u.min}" onchange="s_(${i},'min',this.value)"><input type="number" value="${u.max}" onchange="s_(${i},'max',this.value)"><button class="lk bad" onclick="db.set.units.splice(${i},1);save();set()">✕</button></div>`).join('')}<small>الاسم • النوع • الأدنى • الأقصى</small><button class="b" style="width:100%" onclick="db.set.units.push({n:'وحدة جديدة',t:'ثلاجة',min:-25,max:-18});save();set()">+ وحدة</button></div>
+${Object.keys(LB).map(k=>`<div class="card"><b>${LB[k]}</b>${s[k].map((x,i)=>`<div class="row"><input value="${esc(x)}" onchange="db.set['${k}'][${i}]=this.value;save()"><button class="lk bad" onclick="db.set['${k}'].splice(${i},1);save();set()">✕</button></div>`).join('')}<button class="b" style="width:100%" onclick="db.set['${k}'].push('جديد');save();set()">+ ${LB[k]}</button></div>`).join('')}`}
+function s_(i,k,v){db.set.units[i][k]=k==='min'||k==='max'?+v:v;save()}
+function ADM(){return me.r==='Admin'?`<div class="card"><b>إعدادات السحابة والمستخدمين</b><label>رابط المزامنة السحابية (API URL)<input value="${esc(db.set.syncUrl)}" onchange="db.set.syncUrl=this.value.trim();save()"></label><button class="b" onclick="fetchFromCloud()">🔄 سحب البيانات من السحابة الآن</button><div class="row"><button class="b" onclick="exp('FrozenGuard-backup.json','application/json',JSON.stringify(db))">نسخ احتياطي محلي</button><button class="b g" onclick="imp()">استعادة</button><button class="b r" onclick="if(confirm('إعادة ضبط المصنع؟')){localStorage.removeItem(K);db=def();save();R()}">تصفير</button></div><hr><b>المستخدمون</b>${db.users.map((u,i)=>`<div class="row"><span>${esc(u.n)} (${u.u} - ${RL[u.r]})</span>${u.u!=='admin'?`<button class="lk bad" onclick="db.users.splice(${i},1);save();set()">حذف</button>':''}</div>`).join('')}<button class="b" onclick="addUser()">+ مستخدم</button></div>`:'';}
+function addUser(){const u=prompt('اسم المستخدم (login):'),n=prompt('الاسم الظاهري:'),r=prompt('الدور (Admin, Quality, QMgr, Driver, User1):','User');if(u&&n&&r){db.users.push({u,n,r,p:H('1234')});save();set()}}
+function imp(){const i=document.createElement('input');i.type='file';i.onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=ev=>{try{db=JSON.parse(ev.target.result);mig();save();R();toast('تمت الاستعادة')}catch(er){toast('ملف غير صالح',1)}};fr.readAsText(f)};i.click()}
+function aud(op,mod,d){db.audit=db.audit||[];db.audit.unshift({cr:new Date().toISOString(),by:me.n,op,mod,d:JSON.stringify(d).slice(0,200)});if(db.audit.length>200)db.audit.pop()}
+function det(id){const b=db.batches.find(x=>x.id===id);if(!b)return;$('#md').innerHTML=`<div class="sh"><h3>📦 تفاصيل الدفعة ${esc(b.no)}</h3><p class="m">المنتج: ${esc(b.prod)} • المورد: ${esc(b.sup)} • المخزن: ${esc(b.wh)}</p><p class="s">الإنتاج: ${esc(b.pd)} • الصلاحية: ${esc(b.ex)} • الكمية الأولية: ${esc(b.qty)} • بالكجم: ${esc(b.kg)}</p><div class="qr" id="qrc" style="text-align:center;margin:12px 0"></div><div class="row"><button class="b" onclick="cl()">إغلاق</button><button class="b g" onclick="printQr('${b.no}')">طباعة QR</button></div></div>`;$('#md').className='on';try{const qr=qrcode(0,'M');qr.addData(b.no+'|'+b.prod+'|'+b.pd+'|'+b.ex);qr.make();$('#qrc').innerHTML=qr.createSvgTag({scalable:true})}catch(e){}}
+function printQr(no){$('#pr').innerHTML=`<div style="text-align:center;padding:20px"><h3>FrozenGuard — دفعة: ${no}</h3><div id="pqr"></div></div>`;try{const qr=qrcode(0,'M');qr.addData(no);qr.make();$('#pqr').innerHTML=qr.createSvgTag({scalable:true});print()}catch(e){}}
+function kit(r){return db.batches.filter(b=>b.rid===r.id)}
+function mits(r){return db.batches.filter(b=>b.mid===r.id)}
+function ltg(r){const b=db.batches.find(x=>x.no===r.batch)||db.batches[0];return b?{qty:b.qty,kg:b.kg,refs:b.no}:{} }
+function ltm(r){return r.dur||''}
+function ltr(r){const g=ltg(r),d=+r.dur||1;return d?(+g.kg/d).toFixed(2):'0'}
+function mcn(r){return r.no||''}
+function chk(k,o,id){return ''}
+function autoNcr(r,desc){db.ncr.push({id:Date.now().toString(36),cr:new Date().toISOString(),by:'النظام',no:'NC-'+Math.floor(1e5+Math.random()*9e5),date:td(),type:'انحراف حرارة',sev:'جسيمة',product:r.prod||r.unit||'نظام',batch:r.batch||'',desc,action:'مراجعة وتصحيح الفورية',status:'مفتوحة',s:0})}
+const P={dash,bat:()=>mod('batches'),opr:()=>mod('ops'),tmp:()=>mod('temps'),lt:()=>mod('lt'),qual:()=>mod('ncr'),more:()=>$('#mn').innerHTML=`<h2>المزيد</h2><div class="card mi" onclick="pg='rep';rep()">📊 التقارير</div><div class="card mi" onclick="pg='set';set()">⚙️ الإدارة والأقسام</div><div class="card mi" onclick="pg='audit';mod('audit')">📜 سجل النشاطات</div>`};
 </script></body></html>
